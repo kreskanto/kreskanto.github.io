@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Time Offset</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f4f4f4;
+        padding: 0;
+      }
+      .center-container {
+        text-align: center;
+        justify-content: center;
+        max-width: 500px;
+        background-color: #fff;
+        padding: 10px;
+        padding-top: 0;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      body *:not(h1) {
+        font-size: 1em;
+      }
+      h1 {
+        margin-top: 4px;
+        margin-bottom: 0;
+      }
+      #localTimeParagraph {
+        margin-bottom: 0;
+      }
+      #localTime,
+      #offsetTime {
+        font-size: 2em;
+        font-weight: bold;
+      }
+      input[type="radio"] {
+        vertical-align: -1px;
+      }
+      input[type="number"] {
+        width: 5.6em;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+        width: 25px;
+        height: 25px;
+      }
+      #offsetDirection,
+      #offsetInput {
+        margin-bottom: 0.5em;
+      }
+      button {
+        margin-top: 5px;
+        margin-right: 0px;
+        font-size: 1em;
+        padding: 2.5px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        transition: transform 0.1s, box-shadow 0.1s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transform: translateY(0);
+      }
+      button:not(:last-of-type) {
+        margin-right: 10px;
+      }
+      button:active {
+        transform: translateY(2px);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+      @media screen and (min-width: 768px) {
+        .center-container {
+          transform: scale(2);
+        }
+      }
+      @media (max-width: 768px) {
+        body {
+          align-items: flex-start;
+        }
+        .center-container {
+          max-width: 100%;
+          width: 100%;
+          font-size: 19.7px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center-container">
+      <h1>Custom Time Offset</h1>
+      <p id="localTimeParagraph">
+        Local Time<br />
+        <span id="localTime"></span>
+      </p>
+      <p id="offsetParagraph">
+        Offset Time<br />
+        <span id="offsetTime"></span>
+      </p>
+      <div id="offsetDirection">
+        Offset direction<br />
+        <label><input type="radio" name="offsetDirection" value="positive" checked/>Positive (Fast)</label>
+        <label><input type="radio" name="offsetDirection" value="negative"/>Negative (Slow)</label>
+      </div>
+      <div id="offsetInput">
+        Enter custom offset (Resolution 0.001 s)<br />
+        <input type="number" id="offsetHour" placeholder="Hours" />
+        <input type="number" id="offsetMinute" placeholder="Minutes" />
+        <input type="number" id="offsetSecond" placeholder="Seconds" />
+      </div>
+      <button onclick="applyOffset()">Apply</button>
+      <button onclick="resetOffset()">Reset</button>
+    </div>
+
+    <script>
+      const localTimeElem = document.getElementById("localTime");
+      const offsetInputElem = document.getElementById("offsetInput");
+      const offsetTimeElem = document.getElementById("offsetTime");
+
+      let customOffset = 0;
+
+      function formatTime24Hour(date) {
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = String(date.getSeconds()).padStart(2, "0");
+        return `${hours}:${minutes}:${seconds}`;
+      }
+
+      function displayTime() {
+        const now = new Date();
+        localTimeElem.textContent = formatTime24Hour(now);
+      }
+
+      function displayOffsetTime() {
+        const now = new Date();
+        const offsetTime = new Date(now.getTime() + customOffset * 1000);
+        offsetTimeElem.textContent = formatTime24Hour(offsetTime);
+      }
+
+      function applyOffset() {
+        const hours =
+          parseFloat(document.getElementById("offsetHour").value) || 0;
+        const minutes =
+          parseFloat(document.getElementById("offsetMinute").value) || 0;
+        const seconds =
+          parseFloat(document.getElementById("offsetSecond").value) || 0;
+
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        const directionMultiplier =
+          document.querySelector('input[name="offsetDirection"]:checked')
+            .value === "negative"
+            ? -1
+            : 1;
+
+        customOffset = totalSeconds * directionMultiplier;
+        displayOffsetTime();
+      }
+
+      function resetOffset() {
+        const offsetHourElem = document.getElementById("offsetHour");
+        const offsetMinuteElem = document.getElementById("offsetMinute");
+        const offsetSecondElem = document.getElementById("offsetSecond");
+
+        offsetHourElem.value = "";
+        offsetMinuteElem.value = "";
+        offsetSecondElem.value = "";
+
+        customOffset = 0;
+        displayOffsetTime();
+      }
+
+      function updateTimes() {
+        displayTime();
+        displayOffsetTime();
+      }
+
+      function handleKeydown(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          applyOffset();
+        }
+      }
+
+      document
+        .getElementById("offsetHour")
+        .addEventListener("keydown", handleKeydown);
+      document
+        .getElementById("offsetMinute")
+        .addEventListener("keydown", handleKeydown);
+      document
+        .getElementById("offsetSecond")
+        .addEventListener("keydown", handleKeydown);
+
+      setInterval(updateTimes, 1);
+
+      updateTimes();
+    </script>
+  </body>
+</html>
