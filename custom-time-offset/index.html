@@ -17,17 +17,15 @@
       .center-container {
         text-align: center;
         justify-content: center;
-        max-width: 500px;
         background-color: #fff;
-        padding: 10px;
-        padding-top: 0;
+        padding-bottom: 4px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
       }
       body *:not(h1) {
         font-size: 1em;
       }
       h1 {
-        margin-top: 4px;
+        margin-top: -4px;
         margin-bottom: 0;
       }
       #localTimeParagraph {
@@ -52,6 +50,7 @@
         width: 25px;
         height: 25px;
       }
+      #timeFormat,
       #offsetDirection,
       #offsetInput {
         margin-bottom: 0.5em;
@@ -75,11 +74,6 @@
         transform: translateY(2px);
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
       }
-      @media screen and (min-width: 768px) {
-        .center-container {
-          transform: scale(2);
-        }
-      }
       @media (max-width: 768px) {
         body {
           align-items: flex-start;
@@ -87,7 +81,12 @@
         .center-container {
           max-width: 100%;
           width: 100%;
-          font-size: 19.7px;
+          font-size: 20px;
+          padding-left: 0;
+          padding-right: 0;
+          margin-top: 0;
+          margin-left: 0;
+          margin-right: 0;
         }
       }
     </style>
@@ -103,6 +102,12 @@
         Offset Time<br />
         <span id="offsetTime"></span>
       </p>
+      <div id="timeFormat">
+        Time format<br />
+        <label><input type="radio" name="timeFormat" value="12hour" checked />12-hour (AM/PM)</label>
+        <label><input type="radio" name="timeFormat" value="24hour" />24-hour (00-23)</label>
+        
+      </div>    
       <div id="offsetDirection">
         Offset direction<br />
         <label><input type="radio" name="offsetDirection" value="positive" checked/>Positive (Fast)</label>
@@ -125,22 +130,30 @@
 
       let customOffset = 0;
 
-      function formatTime24Hour(date) {
-        const hours = String(date.getHours()).padStart(2, "0");
+      function formatTime(date) {
+        const hours24 = date.getHours();
         const minutes = String(date.getMinutes()).padStart(2, "0");
         const seconds = String(date.getSeconds()).padStart(2, "0");
-        return `${hours}:${minutes}:${seconds}`;
+
+        const timeFormat = document.querySelector('input[name="timeFormat"]:checked').value;
+        if (timeFormat === '12hour') {
+            const period = hours24 < 12 ? "AM" : "PM";
+            const hours12 = hours24 % 12 || 12;  // 0 is converted to 12 for 12-hour format
+            return `${String(hours12).padStart(2, "0")}:${minutes}:${seconds} ${period}`;
+        } else {
+            return `${String(hours24).padStart(2, "0")}:${minutes}:${seconds}`;
+        }
       }
 
       function displayTime() {
         const now = new Date();
-        localTimeElem.textContent = formatTime24Hour(now);
+        localTimeElem.textContent = formatTime(now);
       }
 
       function displayOffsetTime() {
         const now = new Date();
         const offsetTime = new Date(now.getTime() + customOffset * 1000);
-        offsetTimeElem.textContent = formatTime24Hour(offsetTime);
+        offsetTimeElem.textContent = formatTime(offsetTime);
       }
 
       function applyOffset() {
@@ -200,6 +213,48 @@
       setInterval(updateTimes, 1);
 
       updateTimes();
-    </script>
+      
+      function isFullscreen() {
+        return !!document.fullscreenElement ||       // standard property
+              !!document.mozFullScreenElement ||    // Firefox
+              !!document.webkitFullscreenElement || // Chrome, Safari and Opera 
+              !!document.msFullscreenElement;       // IE/Edge
+      }
+
+      function rescaleContainer() {
+        const container = document.querySelector('.center-container');
+        
+        // Reset any scaling on the container to its original state
+        container.style.transform = 'scale(1)';
+
+        // Use requestAnimationFrame to postpone calculations
+        window.requestAnimationFrame(() => {
+            let scaleFactor = 1;
+        
+            if (isFullscreen()) {
+                scaleFactor = document.documentElement.scrollHeight / container.offsetHeight;
+            } else if (window.innerWidth <= 768) {
+                // For mobile devices
+                scaleFactor = window.innerWidth / container.offsetWidth;
+            } else {
+                // For desktop
+                scaleFactor = document.documentElement.scrollHeight / container.offsetHeight;
+            }
+        
+            // Apply the new scale factor
+            container.style.transform = `scale(${scaleFactor})`;
+        });
+      }
+
+      document.addEventListener('fullscreenchange', rescaleContainer);
+      window.addEventListener("load", rescaleContainer);
+      window.addEventListener("resize", rescaleContainer);
+      window.addEventListener('load', function() {
+      setTimeout(function() {
+        window.scrollTo(0, 0);
+        }, 100);  // Delay of 100 milliseconds
+      });
+
+    </script>    
   </body>
 </html>
