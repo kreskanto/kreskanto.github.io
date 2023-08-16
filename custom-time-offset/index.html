@@ -8,17 +8,18 @@
       body {
         font-family: Arial, sans-serif;
         min-height: 100vh;
+        margin: 0px;
         display: flex;
         justify-content: center;
         align-items: center;
         background-color: #f4f4f4;
-        padding: 0;
+        padding-bottom: 0;
       }
       .center-container {
         text-align: center;
         justify-content: center;
         background-color: #fff;
-        padding-bottom: 4px;
+        padding-bottom: 0px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
       }
       body *:not(h1) {
@@ -73,6 +74,11 @@
       button:active {
         transform: translateY(2px);
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+      @media screen and (min-width: 768px) {
+        .center-container {
+          transform: scale(1.75);
+        }
       }
       @media (max-width: 768px) {
         body {
@@ -249,12 +255,6 @@
       document.addEventListener('fullscreenchange', rescaleContainer);
       window.addEventListener("load", rescaleContainer);
       window.addEventListener("resize", rescaleContainer);
-      window.addEventListener('load', function() {
-      setTimeout(function() {
-        window.scrollTo(0, 0);
-        }, 100);  // Delay of 100 milliseconds
-      });
-
     </script>    
   </body>
 </html>
