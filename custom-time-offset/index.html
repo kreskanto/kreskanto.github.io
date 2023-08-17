@@ -108,23 +108,22 @@
         Offset Time<br />
         <span id="offsetTime"></span>
       </p>
-      <div id="timeFormat">
-        Time format<br />
-        <label><input type="radio" name="timeFormat" value="12hour" checked />12-hour (AM/PM)</label>
-        <label><input type="radio" name="timeFormat" value="24hour" />24-hour (00-23)</label>
-        
-      </div>    
-      <div id="offsetDirection">
-        Offset direction<br />
-        <label><input type="radio" name="offsetDirection" value="positive" checked/>Positive (Fast)</label>
-        <label><input type="radio" name="offsetDirection" value="negative"/>Negative (Slow)</label>
-      </div>
       <div id="offsetInput">
         Enter custom offset (Resolution 0.001 s)<br />
         <input type="number" id="offsetHour" placeholder="Hours" />
         <input type="number" id="offsetMinute" placeholder="Minutes" />
         <input type="number" id="offsetSecond" placeholder="Seconds" />
       </div>
+      <div id="offsetDirection">
+        Offset direction<br />
+        <label><input type="radio" name="offsetDirection" value="positive" checked/>Positive (Fast)</label>
+        <label><input type="radio" name="offsetDirection" value="negative"/>Negative (Slow)</label>
+      </div>    
+      <div id="timeFormat">
+        Time format<br />
+        <label><input type="radio" name="timeFormat" value="12hour" checked />12-hour (AM/PM)</label>
+        <label><input type="radio" name="timeFormat" value="24hour" />24-hour (00-23)</label>        
+      </div>            
       <button onclick="applyOffset()">Apply</button>
       <button onclick="resetOffset()">Reset</button>
     </div>
