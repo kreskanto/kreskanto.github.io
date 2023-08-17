@@ -180,6 +180,11 @@
         displayOffsetTime();
       }
 
+      const offsetDirectionRadios = document.querySelectorAll('input[name="offsetDirection"]');
+      offsetDirectionRadios.forEach(radio => {
+        radio.addEventListener('click', applyOffset);
+      });
+
       function resetOffset() {
         const offsetHourElem = document.getElementById("offsetHour");
         const offsetMinuteElem = document.getElementById("offsetMinute");
